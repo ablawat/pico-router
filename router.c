@@ -8,7 +8,9 @@
 #include "pico/stdlib.h"
 #include "pico/util/datetime.h"
 
-#define PICO_DEBUG_PIN 2
+#define PICO_DEBUG_R 17
+#define PICO_DEBUG_G 16
+#define PICO_DEBUG_B 25
 
 static volatile bool fired = false;
 
@@ -20,25 +22,25 @@ static datetime_t alarm =
     .day   = -1,
     .dotw  = -1,
     .hour  = 0,
-    .min   = 2,
+    .min   = 1,
     .sec   = 0
 };
 
 
 static void alarm_callback(void)
 {
-    alarm.min += 2;
+    alarm.min += 1;
 
     rtc_set_alarm(&alarm, &alarm_callback);
 
     if (fired == true)
     {
-        gpio_put(PICO_DEBUG_PIN, 0);
+        gpio_put(PICO_DEBUG_G, 1);
         fired = false;
     }
     else
     {
-        gpio_put(PICO_DEBUG_PIN, 1);
+        gpio_put(PICO_DEBUG_G, 0);
         fired = true;
     }
 }
@@ -53,7 +55,7 @@ int main()
             .day   = 24,
             .dotw  = 3,
             .hour  = 23,
-            .min   = 58,
+            .min   = 59,
             .sec   = 0
     };
 
@@ -66,10 +68,17 @@ int main()
 
     rtc_set_alarm(&alarm, &alarm_callback);
 
-    gpio_init(PICO_DEBUG_PIN);
-    gpio_set_dir(PICO_DEBUG_PIN, GPIO_OUT);
+    gpio_init(PICO_DEBUG_R);
+    gpio_init(PICO_DEBUG_G);
+    gpio_init(PICO_DEBUG_B);
 
-    gpio_put(PICO_DEBUG_PIN, 0);
+    gpio_set_dir(PICO_DEBUG_R, GPIO_OUT);
+    gpio_set_dir(PICO_DEBUG_G, GPIO_OUT);
+    gpio_set_dir(PICO_DEBUG_B, GPIO_OUT);
+
+    gpio_put(PICO_DEBUG_R, 1);
+    gpio_put(PICO_DEBUG_G, 1);
+    gpio_put(PICO_DEBUG_B, 1);
 
     while (true);
 
